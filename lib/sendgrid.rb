@@ -42,7 +42,6 @@ module SendGrid
   end
 
   module ClassMethods
-
     # Sets a default category for all emails.
     # :use_subject_lines has special behavior that uses the subject-line of
     # each outgoing email for the SendGrid category. This special behavior
@@ -67,7 +66,7 @@ module SendGrid
       self.default_sg_options = Array.new unless self.default_sg_options
       options.each { |option| self.default_sg_options << option if VALID_OPTIONS.include?(option) }
     end
-    
+
     # Sets the default text for subscription tracking (must be enabled).
     # There are two options:
     # 1. Add an unsubscribe link at the bottom of the email
@@ -96,6 +95,11 @@ module SendGrid
     def sendgrid_unique_args(unique_args = {})
       self.default_sg_unique_args = unique_args
     end
+  end
+
+  # Set some base custom headers
+  def sendgrid_default_headers(headers)
+    @sg_default_headers = headers
   end
 
   # Call within mailer method to override the default value.
@@ -156,7 +160,7 @@ module SendGrid
     @ganalytics_options = []
     options.each { |option| @ganalytics_options << option if VALID_GANALYTICS_OPTIONS.include?(option[0].to_sym) }
   end
-  
+
   # only override the appropriate methods for the current ActionMailer version
   if ActionMailer::Base.respond_to?(:mail)
 
@@ -197,11 +201,11 @@ module SendGrid
 
   # Take all of the options and turn it into the json format that SendGrid expects
   def sendgrid_json_headers(mail)
-    header_opts = {}
+    header_opts = @sg_default_headers || {}
 
     #if not called within the mailer method, this will be nil so we default to empty hash
     @sg_unique_args = @sg_unique_args || {}
-    
+
     # set the unique arguments
     if @sg_unique_args || self.class.default_sg_unique_args
       unique_args = self.class.default_sg_unique_args || {}
