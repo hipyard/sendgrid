@@ -176,6 +176,7 @@ module SendGrid
         end
       end
       puts "SendGrid X-SMTPAPI: #{sendgrid_json_headers(message)}" if Object.const_defined?("SENDGRID_DEBUG_OUTPUT") && SENDGRID_DEBUG_OUTPUT
+      self.headers['X-SMTPAPI'] = nil
       self.headers['X-SMTPAPI'] = sendgrid_json_headers(message)
       m
     end
@@ -192,6 +193,7 @@ module SendGrid
         end
       end
       puts "SendGrid X-SMTPAPI: #{sendgrid_json_headers(mail)}" if Object.const_defined?("SENDGRID_DEBUG_OUTPUT") && SENDGRID_DEBUG_OUTPUT
+      @mail['X-SMTPAPI'] = nil
       @mail['X-SMTPAPI'] = sendgrid_json_headers(mail)
     end
 
